@@ -76,6 +76,7 @@ class CPU:
         print()
 
     def run(self):
-        """Run the CPU."""
+        """Run the CPU."""        
         for i in self.ram:
-            print(i)
+            if i == 8:
+                print(i)
