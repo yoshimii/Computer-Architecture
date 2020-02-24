@@ -54,6 +54,8 @@ class CPU:
             self.reg[reg_a] %= self.reg[reg_b]
         elif op =="LDI":
             self.reg[reg_a] = int(self.reg[reg_a])
+        elif op =="HLT":
+            sys.exit(0)
         else:
             raise Exception("Unsupported ALU operation")
 
