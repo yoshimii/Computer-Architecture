@@ -56,6 +56,8 @@ class CPU:
             self.reg[reg_a] = int(self.reg[reg_a])
         elif op =="HLT":
             sys.exit(0)
+        elif op =="PRN":
+            print(int(self.ram[reg_a]))
         else:
             raise Exception("Unsupported ALU operation")
 
