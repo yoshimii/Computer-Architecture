@@ -12,6 +12,9 @@ class CPU:
         self.pc = 0
 
     def ram_read(self, pc):
+        return self.ram[pc]
+    
+    def ram_write(self, pc)
         print(self.ram[pc])
 
     def load(self):
