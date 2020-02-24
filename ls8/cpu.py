@@ -7,8 +7,8 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [None] * 8  
-        self.reg = []
+        self.ram = [None] * 256  
+        self.reg = [None] * 8
         self.pc = 0
 
     def ram_read(self, pc):
@@ -17,26 +17,26 @@ class CPU:
     def ram_write(self, pc):
         print(self.ram[pc])
 
-    def load(self):
+    def load(self,):
         """Load a program into memory."""
 
         address = 0
+        program = []
 
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        
+        with open("examples/print8.ls8") as f:
+                for line in f:
+                    text = line.split('#')
+                    num = text[0].strip()
+                    if num != '':
+                        program.append(num)
 
         for instruction in program:
             self.ram[address] = instruction
             address += 1
+        return program
+        
+        
 
 
     def alu(self, op, reg_a, reg_b):
@@ -52,6 +52,8 @@ class CPU:
             self.reg[reg_a] /= self.reg[reg_b]
         elif op =="MOD":
             self.reg[reg_a] %= self.reg[reg_b]
+        elif op =="LDI":
+            self.reg[reg_a] = int(self.reg[reg_a])
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -76,7 +78,6 @@ class CPU:
         print()
 
     def run(self):
-        """Run the CPU."""        
-        for i in self.ram:
-            if i == 8:
-                print(i)
+        """Run the CPU."""
+
+        
