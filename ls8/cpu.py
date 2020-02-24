@@ -14,7 +14,7 @@ class CPU:
     def ram_read(self, pc):
         return self.ram[pc]
     
-    def ram_write(self, pc)
+    def ram_write(self, pc):
         print(self.ram[pc])
 
     def load(self):
@@ -44,7 +44,14 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "DIV":
+            self.reg[reg_a] /= self.reg[reg_b]
+        elif op =="MOD":
+            self.reg[reg_a] %= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -70,4 +77,5 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        for i in self.ram:
+            print(i)
