@@ -17,14 +17,14 @@ class CPU:
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
 
-    def load(self,):
+    def load(self):
         """Load a program into memory."""
 
         address = 0
         program = []
 
         
-        with open("examples/print8.ls8") as f:
+        with open("examples/mult.ls8") as f:
                 for line in f:
                     text = line.split('#')
                     num = text[0].strip()
@@ -78,21 +78,28 @@ class CPU:
     def run(self):
         """Run the CPU."""
         PC = self.pc
-        # print('STARTER', int(self.ram_read(PC), 2), PC)
         IR = int(self.ram_read(PC), 2)
-
-        operand_a = self.ram_read(PC + 1)
-        operand_b = self.ram_read(PC + 2)
                      
-        while IR != 1:                       
+        while True:
+                    
             if IR == 130: # LDI
-                self.ram_write(int(operand_b, 2), len(self.load()))
+                operand_a = int(self.ram_read(PC + 1), 2)
+                operand_b = int(self.ram_read(PC + 2), 2)
+
+                self.reg[operand_a] = operand_b
             elif IR == 71: # PRINT
-                print(self.ram_read(len(self.load())))
-            elif IR == 1: # HALT
-                sys.exit(0)
+                print(self.reg[operand_a])
+            elif IR == 162:
+                operand_a = int(self.ram_read(PC + 1), 2)
+                operand_b = int(self.ram_read(PC + 2), 2)
+
+                self.alu("MUL", operand_a, operand_b)
+
+            elif IR == 1 and self.ram[PC + 1] == None: # HALT
+                sys.exit(0)                
             PC += 1
             IR = int(self.ram_read(PC), 2)
+
 
         
 
