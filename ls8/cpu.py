@@ -17,14 +17,14 @@ class CPU:
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
 
-    def load(self):
+    def load(self, filename):
         """Load a program into memory."""
 
         address = 0
         program = []
 
         
-        with open("examples/mult.ls8") as f:
+        with open(filename) as f:
                 for line in f:
                     text = line.split('#')
                     num = text[0].strip()
