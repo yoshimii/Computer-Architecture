@@ -16,7 +16,6 @@ class CPU:
     
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
-        print(self.ram[MAR])
 
     def load(self,):
         """Load a program into memory."""
@@ -53,12 +52,6 @@ class CPU:
             self.reg[reg_a] /= self.reg[reg_b]
         elif op =="MOD":
             self.reg[reg_a] %= self.reg[reg_b]
-        elif op =="LDI":
-            self.reg[reg_a] = int(self.reg[reg_a])
-        elif op =="HLT":
-            sys.exit(0)
-        elif op =="PRN":
-            print(int(self.ram[reg_a]))
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -84,5 +77,23 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        PC = self.pc
+        # print('STARTER', int(self.ram_read(PC), 2), PC)
+        IR = int(self.ram_read(PC), 2)
+
+        operand_a = self.ram_read(PC + 1)
+        operand_b = self.ram_read(PC + 2)
+                     
+        while IR != 1:                       
+            if IR == 130: # LDI
+                self.ram_write(int(operand_b, 2), len(self.load()))
+            elif IR == 71: # PRINT
+                print(self.ram_read(len(self.load())))
+            elif IR == 1: # HALT
+                sys.exit(0)
+            PC += 1
+            IR = int(self.ram_read(PC), 2)
+
+        
 
         
