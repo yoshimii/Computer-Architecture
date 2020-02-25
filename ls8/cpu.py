@@ -7,28 +7,36 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [None] * 256  
+        self.reg = [None] * 8
+        self.pc = 0
 
-    def load(self):
+    def ram_read(self, MAR):
+        return self.ram[MAR]
+    
+    def ram_write(self, MDR, MAR):
+        self.ram[MAR] = MDR
+
+    def load(self,):
         """Load a program into memory."""
 
         address = 0
+        program = []
 
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        
+        with open("examples/print8.ls8") as f:
+                for line in f:
+                    text = line.split('#')
+                    num = text[0].strip()
+                    if num != '':
+                        program.append(num)
 
         for instruction in program:
             self.ram[address] = instruction
             address += 1
+        return program
+        
+        
 
 
     def alu(self, op, reg_a, reg_b):
@@ -36,7 +44,14 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "DIV":
+            self.reg[reg_a] /= self.reg[reg_b]
+        elif op =="MOD":
+            self.reg[reg_a] %= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -62,4 +77,23 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        PC = self.pc
+        # print('STARTER', int(self.ram_read(PC), 2), PC)
+        IR = int(self.ram_read(PC), 2)
+
+        operand_a = self.ram_read(PC + 1)
+        operand_b = self.ram_read(PC + 2)
+                     
+        while IR != 1:                       
+            if IR == 130: # LDI
+                self.ram_write(int(operand_b, 2), len(self.load()))
+            elif IR == 71: # PRINT
+                print(self.ram_read(len(self.load())))
+            elif IR == 1: # HALT
+                sys.exit(0)
+            PC += 1
+            IR = int(self.ram_read(PC), 2)
+
+        
+
+        
