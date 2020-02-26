@@ -10,6 +10,7 @@ class CPU:
         self.ram = [None] * 256  
         self.reg = [None] * 8
         self.pc = 0
+        self.sp = 244
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -77,16 +78,24 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        SP = self.sp
         PC = self.pc
         IR = int(self.ram_read(PC), 2)
                      
         while True:
-                    
+
             if IR == 130: # LDI
                 operand_a = int(self.ram_read(PC + 1), 2)
                 operand_b = int(self.ram_read(PC + 2), 2)
 
                 self.reg[operand_a] = operand_b
+                # print('LDI operand a', self.reg[operand_a])
+                # print('LDI',self.reg)
+            elif IR == 69: # PUSH the register in next IR to stack: SP - 1, increment SP
+                print('RAM', self.ram[-15:])
+                print('REG', self.reg)
+                self.ram_write(self.reg[int(self.ram_read(PC +1), 2)], SP - 1)
+                SP -= 1
             elif IR == 71: # PRINT
                 print(self.reg[operand_a])
             elif IR == 162:
