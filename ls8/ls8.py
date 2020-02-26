@@ -4,8 +4,15 @@
 
 import sys
 from cpu import *
-
-cpu = CPU()
-
-cpu.load()
-cpu.run()
+    
+try:
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        cpu = CPU()
+        cpu.load(filename)
+        cpu.run()
+    else: 
+        print("Not enough arguments.")
+                
+except FileNotFoundError:
+    print("Filename invalid. Try again with something like: 'examples/mult.ls8'")
