@@ -11,6 +11,7 @@ class CPU:
         self.reg = [None] * 8
         self.pc = 0
         self.sp = 244
+        self.ram[244] = '*' # Mark bottom of stack
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -85,31 +86,32 @@ class CPU:
         while True:
 
             if IR == 130: # LDI
+                
                 operand_a = int(self.ram_read(PC + 1), 2)
                 operand_b = int(self.ram_read(PC + 2), 2)
 
                 self.reg[operand_a] = operand_b
-                # print('LDI operand a', self.reg[operand_a])
-                # print('LDI',self.reg)
-            elif IR == 69: # PUSH the register in next IR to stack: SP - 1, increment SP
-                print('RAM', self.ram[-15:])
-                print('REG', self.reg)
-                self.ram_write(self.reg[int(self.ram_read(PC +1), 2)], SP - 1)
+                
+            elif IR == 69: # PUSH the register in next IR to stack: SP - 1, increment SP                
+                self.ram_write(self.reg[int(self.ram_read(PC + 1), 2)], SP - 1)
                 SP -= 1
-            elif IR == 71: # PRINT
-                print(self.reg[operand_a])
-            elif IR == 162:
+                
+            elif IR == 70: # POP the value from top of stack (SP) and store in register in next IR, decrement SP                
+                POP = self.ram[SP]
+                self.ram[SP] == None
+                self.reg[int(self.ram_read(PC + 1), 2)] = POP
+                SP += 1
+                
+            elif IR == 71: # PRINT                
+                print(self.reg[int(self.ram_read(PC + 1), 2)])       
+                         
+            elif IR == 162:            
                 operand_a = int(self.ram_read(PC + 1), 2)
                 operand_b = int(self.ram_read(PC + 2), 2)
-
                 self.alu("MUL", operand_a, operand_b)
 
-            elif IR == 1 and self.ram[PC + 1] == None: # HALT
+            elif IR == 1 and self.ram[PC + 1] == None: # HALT                
                 sys.exit(0)                
+                
             PC += 1
-            IR = int(self.ram_read(PC), 2)
-
-
-        
-
-        
+            IR = int(self.ram_read(PC), 2)    
