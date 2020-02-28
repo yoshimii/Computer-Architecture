@@ -31,6 +31,7 @@ class CPU:
                     text = line.split('#')
                     num = text[0].strip()
                     if num != '':
+                        # program.append(int((num), 2))
                         program.append(num)
 
         for instruction in program:
@@ -85,11 +86,9 @@ class CPU:
                      
         while True:
 
-            if IR == 130: # LDI
-                
+            if IR == 130: # LDI                
                 operand_a = int(self.ram_read(PC + 1), 2)
                 operand_b = int(self.ram_read(PC + 2), 2)
-
                 self.reg[operand_a] = operand_b
                 
             elif IR == 69: # PUSH the register in next IR to stack: SP - 1, increment SP                
@@ -105,13 +104,29 @@ class CPU:
             elif IR == 71: # PRINT                
                 print(self.reg[int(self.ram_read(PC + 1), 2)])       
                          
-            elif IR == 162:            
+            elif IR == 162: #        
                 operand_a = int(self.ram_read(PC + 1), 2)
                 operand_b = int(self.ram_read(PC + 2), 2)
                 self.alu("MUL", operand_a, operand_b)
-
-            elif IR == 1 and self.ram[PC + 1] == None: # HALT                
-                sys.exit(0)                
+            
+            elif IR == 160: # ADD
+                operand_a = int(self.ram_read(PC + 1), 2)
+                operand_b = int(self.ram_read(PC + 2), 2)
+                self.alu("ADD", operand_a, operand_b)
                 
-            PC += 1
-            IR = int(self.ram_read(PC), 2)    
+            elif IR == 80: # CALL a subroutine at the address stored in the register
+                self.ram_write(PC + 2, SP - 1)
+                SP -= 1
+                PC = self.reg[int(self.ram_read(PC + 1), 2)]                
+                
+            elif IR == 17: # RET
+                POP = self.ram[SP]
+                self.ram[SP] = None
+                PC = POP
+                SP += 1
+                
+            elif IR == 1: # HALT                
+                sys.exit(0)                
+            if not (IR & 0b00010000):
+                PC += 1 + (IR >> 6)  
+            IR = int(self.ram_read(PC), 2)
