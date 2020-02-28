@@ -12,7 +12,8 @@ class CPU:
         self.pc = 0
         self.sp = 244
         self.ram[244] = '*' # Mark bottom of stack
-
+        self.fl = 0b00000000 #0b00000LGE (less than, greater than, equal)
+        
     def ram_read(self, MAR):
         return self.ram[MAR]
     
@@ -55,6 +56,13 @@ class CPU:
             self.reg[reg_a] /= self.reg[reg_b]
         elif op =="MOD":
             self.reg[reg_a] %= self.reg[reg_b]
+        elif op =="CMP":
+            if self.reg[reg_a] < self.reg[reg_b]: # L
+                self.fl = 0b00000100 or self.fl
+            if self.reg[reg_a] == self.reg[reg_b]: # E
+                self.fl = 0b00000001 or self.fl
+            if self.reg[reg_a] > self.reg[reg_b]: # G
+                self.fl = 0b00000010 or self.fl
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -125,8 +133,31 @@ class CPU:
                 PC = POP
                 SP += 1
                 
+            elif IR == 84: # JMP
+                PC = self.reg[int(self.ram_read(PC + 1), 2)]
+                
+            elif IR == 85: # JEQ
+                if self.fl & 0b00000001:
+                    PC = self.reg[int(self.ram_read(PC + 1), 2)]
+                else: PC += 2
+                    
+            elif IR == 86: # JNE
+                if not self.fl & 0b00000001:
+                    PC = self.reg[int(self.ram_read(PC + 1), 2)]
+                else: PC += 2
+                    
+            elif IR == 167: # CMP
+                operand_a = int(self.ram_read(PC + 1), 2)
+                operand_b = int(self.ram_read(PC + 2), 2)
+                self.alu("CMP", operand_a, operand_b)                    
+                    
+                    
+                
             elif IR == 1: # HALT                
                 sys.exit(0)                
-            if not (IR & 0b00010000):
+            if not (IR & 0b00010000): # If not a CALL 
                 PC += 1 + (IR >> 6)  
             IR = int(self.ram_read(PC), 2)
+            # print(PC, IR)
+            # print("REG", self.reg)
+            # print("RAM", self.ram[-20:])
